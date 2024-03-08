@@ -7,14 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.technotestvk.api.ProductApi
-import com.example.technotestvk.databinding.FragmentProductPageBinding
+import com.example.technotestvk.databinding.FragmentProductsBinding
 import com.example.technotestvk.recycler.OnItemListener
 import com.example.technotestvk.recycler.ProductRecyclerViewAdapter
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,11 +23,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class ProductPage : Fragment(),OnItemListener {
-    private lateinit var binding: FragmentProductPageBinding
+class ProductPage : Fragment(), OnItemListener {
+    private lateinit var binding: FragmentProductsBinding
     private val page = Page(1)
     private val adapter = ProductRecyclerViewAdapter(this)
-    private  val productApi = getRetrofitClient().create(ProductApi::class.java)
+    private val productApi = getRetrofitClient().create(ProductApi::class.java)
+    private val viewModel by viewModels<ProductViewModel>(::requireActivity)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,8 +36,8 @@ class ProductPage : Fragment(),OnItemListener {
 
 
 
-            lifecycleScope.launch(Dispatchers.IO) {
-            val list = productApi.getPage(0,20)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val list = productApi.getPage(0, 20)
 
 
             withContext(Dispatchers.Main) {
@@ -46,7 +48,6 @@ class ProductPage : Fragment(),OnItemListener {
         }
 
 
-
     }
 
     override fun onCreateView(
@@ -54,8 +55,10 @@ class ProductPage : Fragment(),OnItemListener {
         savedInstanceState: Bundle?
     ): View {
 
-        binding = FragmentProductPageBinding.inflate(layoutInflater)
-        binding.rvList.layoutManager = GridLayoutManager(context,2)
+
+
+        binding = FragmentProductsBinding.inflate(layoutInflater)
+        binding.rvList.layoutManager = GridLayoutManager(context, 2)
         binding.rvList.adapter = adapter
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.rvList) { v, insets ->
@@ -69,7 +72,7 @@ class ProductPage : Fragment(),OnItemListener {
     override fun onEnd() {
         val list = adapter.currentList.toMutableList()
         lifecycleScope.launch(Dispatchers.IO) {
-            list.addAll(productApi.getPage(page.getSkip(),page.getLimit()).products)
+            list.addAll(productApi.getPage(page.getSkip(), page.getLimit()).products)
             page.page++
             withContext(Dispatchers.Main) {
 
@@ -80,11 +83,14 @@ class ProductPage : Fragment(),OnItemListener {
     }
 
     override fun onItemClick(item: Product) {
-//        TODO("Not yet implemented")
+        val action = ProductPageDirections.actionProductsToProductPageFragment2(item.id)
+        viewModel.item = item
+        findNavController().navigate(action)
     }
 
 
 }
+
 fun getRetrofitClient(): Retrofit {
     val retrofit = Retrofit.Builder().baseUrl("https://dummyjson.com")
         .addConverterFactory(GsonConverterFactory.create())

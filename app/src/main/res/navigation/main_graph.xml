@@ -11,6 +11,22 @@
         android:id="@+id/products"
         android:name="com.example.technotestvk.ProductPage"
         android:label="fragment_products"
+        tools:layout="@layout/fragment_products"
+        >
+        <action
+            android:id="@+id/action_products_to_productPageFragment2"
+            app:destination="@id/productPageFragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/productPageFragment"
+        android:name="com.example.technotestvk.ProductPageFragment"
+        android:label="fragment_product_page"
         tools:layout="@layout/fragment_product_page"
-        />
+        >
+        <argument
+            android:name="id"
+            app:argType="integer"
+            />
+    </fragment>
 </navigation>
