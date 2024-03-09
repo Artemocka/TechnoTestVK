@@ -1,4 +1,4 @@
-package com.example.technotestvk
+package com.example.technotestvk.data
 
 import android.graphics.Bitmap
 

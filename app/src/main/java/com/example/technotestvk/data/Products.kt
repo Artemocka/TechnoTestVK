@@ -1,4 +1,4 @@
-package com.example.technotestvk
+package com.example.technotestvk.data
 
 class Products(
     val products: List<Product>

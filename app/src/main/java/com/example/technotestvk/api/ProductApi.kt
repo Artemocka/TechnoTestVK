@@ -1,7 +1,7 @@
 package com.example.technotestvk.api
 
-import com.example.technotestvk.Product
-import com.example.technotestvk.Products
+import com.example.technotestvk.data.Product
+import com.example.technotestvk.data.Products
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface ProductApi {
     @GET("products/{id}")
-    suspend fun getProductById(@Path("id") id: Int):Product
+    suspend fun getProductById(@Path("id") id: Int): Product
 
     @GET("products")
     suspend fun getAllProduct(): Products

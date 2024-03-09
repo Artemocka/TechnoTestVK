@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.technotestvk.Product
+import com.example.technotestvk.data.Product
 import com.example.technotestvk.databinding.ProductCardBinding
 
 

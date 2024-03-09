@@ -13,9 +13,15 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:menu="@menu/main"
         style="@style/Widget.Material3.Toolbar"
         app:title="@string/app_name"
-        />
+        >
+        <include
+            android:id="@+id/search_bar"
+            layout="@layout/search_bar"
+            />
+    </com.google.android.material.appbar.MaterialToolbar>
 
         <FrameLayout
             android:layout_width="match_parent"

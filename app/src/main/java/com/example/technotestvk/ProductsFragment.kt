@@ -1,12 +1,12 @@
 package com.example.technotestvk
 
-import android.opengl.Visibility
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.isVisible
@@ -16,6 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.technotestvk.api.ProductApi
+import com.example.technotestvk.data.Page
+import com.example.technotestvk.data.Product
 import com.example.technotestvk.databinding.FragmentProductsBinding
 import com.example.technotestvk.recycler.OnItemListener
 import com.example.technotestvk.recycler.ProductRecyclerViewAdapter
@@ -53,6 +55,31 @@ class ProductPage : Fragment(), OnItemListener {
 
         binding.reload.setOnClickListener{
             requestNextPage()
+        }
+
+        binding.toolbar.setOnMenuItemClickListener {
+//            binding.toolbar.isVisible = false
+            binding.searchBar.root.isVisible = true
+            binding.toolbar.menu.findItem(R.id.app_bar_search).isVisible = false
+            binding.searchBar.searchEditText.requestFocus()
+            binding.searchBar.searchIcon.isVisible = false
+
+
+            val imm =
+                binding.root.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.showSoftInput(binding.searchBar.searchEditText, 0)
+
+            true
+        }
+
+        binding.searchBar.cancelButton.setOnClickListener {
+            binding.toolbar.menu.findItem(R.id.app_bar_search).isVisible = true
+            binding.searchBar.searchEditText.clearFocus()
+            binding.searchBar.searchEditText.text.clear()
+            binding.searchBar.root.isVisible = false
+            binding.searchBar.searchIcon.isVisible = true
+            hideKeyboard()
+
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
@@ -113,6 +140,12 @@ class ProductPage : Fragment(), OnItemListener {
 
         }
     }
+    private fun hideKeyboard() {
+        val imm =
+            binding.root.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(binding.root.windowToken, 0)
+    }
+
 
 }
 
