@@ -14,8 +14,6 @@ class ProductRecyclerViewAdapter(
     private val listener: OnItemListener,
 ) : ListAdapter<Product, ProductRecyclerViewAdapter.ViewHolder>(ProductDiffCallback()) {
 
-    private var paginationEdge = -1
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ProductCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
@@ -29,8 +27,7 @@ class ProductRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val item = currentList[position]
         holder.bind(item)
-        if (position == itemCount.dec() && position != paginationEdge) {
-            paginationEdge = position
+        if (position == itemCount.dec()) {
             listener.onEnd()
         }
     }

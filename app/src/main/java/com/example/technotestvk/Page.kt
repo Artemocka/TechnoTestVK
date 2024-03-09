@@ -1,14 +1,13 @@
 package com.example.technotestvk
 
-class Page(var page:Int, ){
+data class Page(val index:Int=0, val isRequesting:Boolean= false){
 
-    
     fun getLimit():Int{
         return 20
     }
     
     fun getSkip():Int{
-        return page*20
+        return index*20
     }
     
     

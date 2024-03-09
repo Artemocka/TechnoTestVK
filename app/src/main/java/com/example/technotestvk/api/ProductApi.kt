@@ -16,7 +16,7 @@ interface ProductApi {
 
 
     @GET("products/")
-    suspend fun getPage(@Query("skip") skip:Int,@Query("limit") limit:Int): Products
+    suspend fun getPage(@Query("skip") skip:Int,@Query("limit") limit:Int): Products?
 
 
 }
