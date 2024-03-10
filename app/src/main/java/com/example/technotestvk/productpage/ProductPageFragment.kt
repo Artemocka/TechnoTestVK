@@ -41,7 +41,7 @@ class ProductPageFragment : Fragment(), CategoryCardRecyclerViewAdapter.OnItemLi
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     item = productApi.getProductById(id)
-                    catergoryProducts = productApi.getCategories(item!!.category)
+                    catergoryProducts = productApi.getCategory(item!!.category)
                     catergoryProducts = Products(catergoryProducts.products.filter { product: Product -> product!=item })
                     viewModel.item.push(item)
                 } catch (_: Exception) {
@@ -52,7 +52,7 @@ class ProductPageFragment : Fragment(), CategoryCardRecyclerViewAdapter.OnItemLi
             item = viewModel.item.peek()
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    catergoryProducts = productApi.getCategories(item!!.category)
+                    catergoryProducts = productApi.getCategory(item!!.category)
                     catergoryProducts = Products(catergoryProducts.products.filter { product: Product -> product!=item })
                     lifecycleScope.launch (Dispatchers.Main.immediate){
                         categoryAdapter.submitList(catergoryProducts.products)

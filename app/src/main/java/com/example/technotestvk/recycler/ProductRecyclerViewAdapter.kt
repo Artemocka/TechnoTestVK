@@ -16,19 +16,19 @@ class ProductRecyclerViewAdapter(
 ) : ListAdapter<Product, ProductRecyclerViewAdapter.ViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ProductCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ProductCardBinding.inflate(LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
 
-        val viewHolder = ViewHolder(binding, listener)
-
-
-
-        return viewHolder
+        return ViewHolder(binding, listener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         poop("onBindViewHolder(): $position")
         val item = currentList[position]
         holder.bind(item)
+
         if (position == itemCount.dec()) {
             listener.onEnd()
         }
@@ -40,11 +40,9 @@ class ProductRecyclerViewAdapter(
         private val listener: OnItemListener,
     ) : RecyclerView.ViewHolder(binding.root) {
         private lateinit var item: Product
-
         init {
             binding.root.setOnClickListener { listener.onItemClick(item) }
         }
-
         fun bind(item: Product) {
             this.item = item
             binding.run {
@@ -54,10 +52,6 @@ class ProductRecyclerViewAdapter(
                 Glide.with(binding.root)
                     .load(item.thumbnail)
                     .into(thumbnail)
-
-
-
-
             }
         }
     }

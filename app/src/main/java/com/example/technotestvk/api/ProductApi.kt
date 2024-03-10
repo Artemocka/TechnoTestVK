@@ -18,10 +18,13 @@ interface ProductApi {
     @GET("products/")
     suspend fun getPage(@Query("skip") skip:Int,@Query("limit") limit:Int): Products
     @GET("products/category/{category}")
-    suspend fun getCategories(@Path("category") category:String): Products
+    suspend fun getCategory(@Path("category") category:String): Products
 
     @GET("products/categories")
     suspend fun getCategories(): List<String>
+
+    @GET("products/search")
+    suspend fun getProductByName(@Query("q") name:String): Products
 
 
 }
