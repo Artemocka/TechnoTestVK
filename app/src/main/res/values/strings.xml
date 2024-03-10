@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">TechnoTestVK</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="from_the_same_category">From the same category</string>
+    <string name="reload">Reaload</string>
 </resources>

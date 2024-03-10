@@ -5,9 +5,9 @@ data class Page(
     val filter: String? = null,
     val search: String? = null,
     val isRequesting: Boolean = false,
-    val list: MutableList<Product> = mutableListOf(),
-    val categorylist: MutableList<Product> = mutableListOf(),
-    val searchList: MutableList<Product> = mutableListOf(),
+    val list: List<Product> = listOf(),
+    val categorylist: List<Product> = listOf(),
+    val searchList: List<Product> = listOf(),
 
     ) {
     fun getLimit(): Int {

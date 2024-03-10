@@ -221,7 +221,7 @@
                     android:padding="12dp"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="Из той же категории:"
+                    android:text="@string/from_the_same_category"
                     tools:text="5.0"
                     />
             </androidx.cardview.widget.CardView>

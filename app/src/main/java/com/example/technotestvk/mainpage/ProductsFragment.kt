@@ -47,6 +47,7 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
     private val productApi = getRetrofitClient().create(ProductApi::class.java)
     private val viewModel by viewModels<ProductViewModel>(::requireActivity)
     private var snackbar: Snackbar? = null
+    private var tempFilter:String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNextPage()
@@ -83,6 +84,8 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             binding.searchBar.searchEditText.requestFocus()
             binding.searchBar.searchIcon.isVisible = false
             binding.chipRv.isVisible = false
+            tempFilter = page.filter
+            page = page.copy(filter = null)
 
 
             val imm =
@@ -99,12 +102,15 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             binding.searchBar.root.isVisible = false
             binding.searchBar.searchIcon.isVisible = true
             binding.chipRv.isVisible = true
+            page = page.copy(filter = tempFilter)
+            tempFilter = null
             page = page.copy(search = null, searchList = mutableListOf())
             renderPage()
             hideKeyboard()
 
+
         }
-        binding.searchBar.searchEditText.addTextChangedListener(afterTextChanged = {text: Editable? ->
+        binding.searchBar.searchEditText.addTextChangedListener(afterTextChanged = { text: Editable? ->
             page = page.copy(search = text.toString())
             requestSearch()
             renderPage()
@@ -135,9 +141,12 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
     private fun requestCategory() {
         if (page.filter == null)
             return
+        val filter: String = page.filter!!
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                page.filter?.let { productApi.getCategory(it).products }?.let { page = page.copy(categorylist = it.toMutableList()) }
+                val list = productApi.getCategory(filter).products
+                page = page.copy(categorylist = list)
+
                 withContext(Dispatchers.Main.immediate) {
                     renderPage()
                 }
@@ -157,7 +166,7 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             try {
 
                 page.search?.let { productApi.getProductByName(it).products }?.let {
-                    page = page.copy(searchList = it.toMutableList())
+                    page = page.copy(searchList = it)
                 }
                 withContext(Dispatchers.Main.immediate) {
 
@@ -173,7 +182,7 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
 
 
     private fun requestNextPage() {
-        if (page.isRequesting || page.filter != null|| page.search !=null)
+        if (page.isRequesting || page.filter != null || page.search != null)
             return
 
 
@@ -185,10 +194,10 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
                 binding.reload.isEnabled = false
             }
             try {
-                page.list.addAll(productApi.getPage(page.getSkip(), page.getLimit())!!.products)
-                withContext(Dispatchers.Main.immediate) {
+                val list = productApi.getPage(page.getSkip(), page.getLimit())!!.products
+                withContext(Dispatchers.Main) {
                     binding.reload.isVisible = false
-                    poop("page.list.size =${page.list.size} ")
+                    page = page.copy(list = page.list + list)
                     renderPage()
 
                 }
@@ -213,14 +222,17 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
     private fun renderPage() {
         if (page.filter != null) {
             adapter.submitList(page.categorylist)
-        }
-        else if (page.search != null) {
+        } else if (page.search != null) {
             adapter.submitList(page.searchList)
-        }
-        else {
-            if (page.categorylist.isNotEmpty())
-                page = page.copy(categorylist = mutableListOf())
+        } else {
+            if (page.filter == null) {
+                if (page.categorylist.isNotEmpty())
+                    page = page.copy(categorylist = listOf())
+            }
+            poop("page.list.size =${page.list.size} ")
+            poop("adapter before: ${adapter.currentList.size}")
             adapter.submitList(page.list)
+            poop("adapter after: ${adapter.currentList.size}")
             poop("adapter.submitList(page.list)")
         }
     }
@@ -235,6 +247,7 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
 
         page = page.copy(filter = category)
         requestCategory()
+        renderPage()
 
 
     }
