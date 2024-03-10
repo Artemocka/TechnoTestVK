@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ProductPageFragment"
+    tools:context=".productpage.ProductPageFragment"
     >
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -18,7 +18,7 @@
         tools:layout_editor_absoluteX="0dp"
         />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
@@ -28,25 +28,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             >
-            <androidx.cardview.widget.CardView
-                style="@style/Widget.Material3.CardView.Filled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:foreground="?selectableItemBackground"
-                app:cardCornerRadius="12dp"
-                >
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toolbar"
-                />
-            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 style="@style/Widget.Material3.CardView.Filled"
@@ -56,14 +37,15 @@
                 android:foreground="?selectableItemBackground"
                 app:cardCornerRadius="12dp"
                 >
-                <TextView
-                    android:id="@+id/title"
-                    android:padding="12dp"
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:orientation="horizontal"
                     />
+
+
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -74,25 +56,69 @@
                 android:foreground="?selectableItemBackground"
                 app:cardCornerRadius="12dp"
                 >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+
+                    <TextView
+                        android:id="@+id/price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"
+                        android:textSize="18sp"
+                        tools:text="$1200"
+                        />
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="title"
+                        />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:foreground="?selectableItemBackground"
+                app:cardCornerRadius="12dp"
+                >
+
                 <TextView
                     android:id="@+id/description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
                     android:padding="12dp"
+                    android:textSize="18sp"
+                    tools:text="description"
                     />
             </androidx.cardview.widget.CardView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
+
                 <androidx.cardview.widget.CardView
                     style="@style/Widget.Material3.CardView.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:foreground="?selectableItemBackground"
                     android:layout_weight="1"
+                    android:foreground="?selectableItemBackground"
                     app:cardCornerRadius="12dp"
                     >
 
@@ -100,31 +126,35 @@
                         android:id="@+id/rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:padding="12dp"
-                        android:textStyle="bold"
-                        android:drawablePadding="4dp"
-                        app:drawableLeftCompat="@drawable/ic_star"
                         android:layout_gravity="center"
+                        android:drawablePadding="4dp"
+                        android:padding="12dp"
+                        android:textSize="14sp"
+                        app:drawableLeftCompat="@drawable/ic_star"
+                        tools:text="5.0"
                         />
                 </androidx.cardview.widget.CardView>
+
                 <androidx.cardview.widget.CardView
                     style="@style/Widget.Material3.CardView.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:layout_weight="1"
                     android:foreground="?selectableItemBackground"
                     app:cardCornerRadius="12dp"
-                    android:layout_weight="2"
                     >
+
                     <TextView
                         android:id="@+id/stock"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
+                        android:layout_gravity="center"
+                        android:drawablePadding="4dp"
                         android:padding="12dp"
-                        android:textStyle="bold"
-                        android:gravity="center"
+                        android:textSize="14sp"
+                        app:drawableLeftCompat="@drawable/ic_stock"
+                        tools:text="5.0"
                         />
                 </androidx.cardview.widget.CardView>
                 <androidx.cardview.widget.CardView
@@ -132,26 +162,80 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
-                    android:foreground="?selectableItemBackground"
-                    android:background="?colorPrimary"
-                    app:cardCornerRadius="12dp"
                     android:layout_weight="2"
+                    android:foreground="?selectableItemBackground"
+                    app:cardCornerRadius="12dp"
                     >
+
                     <TextView
-                        android:id="@+id/category"
-                        android:layout_width="match_parent"
+                        android:id="@+id/brand"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="16sp"
+                        android:layout_gravity="center"
+                        android:drawablePadding="4dp"
                         android:padding="12dp"
-                        android:textStyle="bold"
-                        android:gravity="center"
+                        android:textSize="14sp"
+                        app:drawableLeftCompat="@drawable/ic_brand"
+                        tools:text="Brand"
                         />
                 </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    style="@style/Widget.Material3.CardView.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="2"
+                    android:background="?colorPrimary"
+                    android:foreground="?selectableItemBackground"
+                    app:cardCornerRadius="12dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:drawablePadding="4dp"
+                        android:padding="12dp"
+                        android:textSize="14sp"
+                        android:drawableLeft="@drawable/ic_category"
+                        tools:text="Category"
+                        />
+
+
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
+            <androidx.cardview.widget.CardView
+                style="@style/Widget.Material3.CardView.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:foreground="?selectableItemBackground"
+                app:cardCornerRadius="12dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
+                    android:padding="12dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:text="Из той же категории:"
+                    tools:text="5.0"
+                    />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/category_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                />
 
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 
 </LinearLayout>

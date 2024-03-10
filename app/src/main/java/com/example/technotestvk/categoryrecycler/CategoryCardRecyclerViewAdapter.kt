@@ -1,4 +1,4 @@
-package com.example.technotestvk.recycler
+package com.example.technotestvk.categoryrecycler
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -7,63 +7,61 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.technotestvk.data.Product
-import com.example.technotestvk.databinding.ProductCardBinding
-import com.example.technotestvk.poop
+import com.example.technotestvk.databinding.CategoryCardBinding
+import com.example.technotestvk.recycler.OnItemListener
 
 
-class ProductRecyclerViewAdapter(
-    private val listener: OnItemListener,
-) : ListAdapter<Product, ProductRecyclerViewAdapter.ViewHolder>(ProductDiffCallback()) {
+class CategoryCardRecyclerViewAdapter(private val listener: OnItemListener,) : ListAdapter<Product, CategoryCardRecyclerViewAdapter.ViewHolder>(ProductDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ProductCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
+        val binding = CategoryCardBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         val viewHolder = ViewHolder(binding, listener)
-
-
-
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
-        poop("onBindViewHolder(): $position")
         val item = currentList[position]
         holder.bind(item)
-        if (position == itemCount.dec()) {
-            listener.onEnd()
-        }
+
     }
 
 
     class ViewHolder(
-        private val binding: ProductCardBinding,
+        private val binding: CategoryCardBinding,
         private val listener: OnItemListener,
-    ) : RecyclerView.ViewHolder(binding.root) {
+
+        ) : RecyclerView.ViewHolder(binding.root) {
         private lateinit var item: Product
 
         init {
             binding.root.setOnClickListener { listener.onItemClick(item) }
+
         }
 
         fun bind(item: Product) {
             this.item = item
+//            Log.e("",item)
+
             binding.run {
-                price.text = "$${item.price}"
+
                 title.text = item.title
-                description.text = item.description
+                price.text = "$${item.price}"
+
                 Glide.with(binding.root)
                     .load(item.thumbnail)
                     .into(thumbnail)
 
 
-
-
             }
         }
     }
+    interface OnItemListener {
+        fun onItemClick(item: Product)
+    }
 }
 
-interface OnItemListener {
-    fun onEnd()
-    fun onItemClick(item: Product)
-}
+

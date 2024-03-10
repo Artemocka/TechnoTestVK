@@ -1,4 +1,4 @@
-package com.example.technotestvk
+package com.example.technotestvk.mainpage
 
 import android.content.Context
 import android.os.Bundle
@@ -15,12 +15,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.technotestvk.R
 import com.example.technotestvk.api.ProductApi
+import com.example.technotestvk.chips.ChipsAdapter
+import com.example.technotestvk.chips.ChipsAdapter.OnChipListner
 import com.example.technotestvk.data.Page
 import com.example.technotestvk.data.Product
+import com.example.technotestvk.data.toFilterChip
 import com.example.technotestvk.databinding.FragmentProductsBinding
+import com.example.technotestvk.poop
 import com.example.technotestvk.recycler.OnItemListener
 import com.example.technotestvk.recycler.ProductRecyclerViewAdapter
+import com.example.technotestvk.viewmodel.ProductViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,16 +35,27 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class ProductPage : Fragment(), OnItemListener {
+class ProductPage : Fragment(), OnItemListener, OnChipListner {
     private lateinit var binding: FragmentProductsBinding
     private var page = Page()
+        set(value) {
+            field = value
+            poop("page $page")
+        }
     private val adapter = ProductRecyclerViewAdapter(this)
+    private val chipsAdapter:ChipsAdapter = ChipsAdapter(this)
     private val productApi = getRetrofitClient().create(ProductApi::class.java)
     private val viewModel by viewModels<ProductViewModel>(::requireActivity)
     private var snackbar: Snackbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNextPage()
+        lifecycleScope.launch(Dispatchers.IO){
+            val list = productApi.getCategories().toFilterChip()
+            lifecycleScope.launch(Dispatchers.Main.immediate){
+                chipsAdapter.submitList(list)
+            }
+        }
 
     }
 
@@ -48,14 +65,16 @@ class ProductPage : Fragment(), OnItemListener {
     ): View {
 
 
-
         binding = FragmentProductsBinding.inflate(layoutInflater)
         binding.rvList.layoutManager = GridLayoutManager(context, 2)
         binding.rvList.adapter = adapter
 
-        binding.reload.setOnClickListener{
+        binding.reload.setOnClickListener {
             requestNextPage()
         }
+        binding.chipRv.adapter= chipsAdapter
+        binding.chipRv.itemAnimator = null
+
 
         binding.toolbar.setOnMenuItemClickListener {
 //            binding.toolbar.isVisible = false
@@ -87,6 +106,7 @@ class ProductPage : Fragment(), OnItemListener {
             val rvPadding = binding.rvList.paddingTop
             binding.rvList.setPadding(systemBars.left + rvPadding, rvPadding, systemBars.right + rvPadding, systemBars.bottom + rvPadding)
             binding.toolbar.updatePaddingRelative(top = systemBars.top)
+
             insets
         }
 
@@ -99,27 +119,29 @@ class ProductPage : Fragment(), OnItemListener {
     }
 
     override fun onItemClick(item: Product) {
-        val action = ProductPageDirections.actionProductsToProductPageFragment2(item.id)
-        viewModel.item = item
+        val action = ProductPageDirections.actionMainToProduct(item.id)
+        viewModel.item.push(item)
         findNavController().navigate(action)
     }
 
     private fun requestNextPage() {
-        if (page.isRequesting)
+        poop("requestNextPage(): ${page.isRequesting} - ${page.filter}")
+        if (page.isRequesting || page.filter!=null)
             return
-        val list = adapter.currentList.toMutableList()
+
+
         snackbar?.dismiss()
+        page = page.copy(isRequesting = true)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 binding.reload.isEnabled = false
             }
-            page = page.copy(isRequesting = true)
             try {
-                list.addAll(productApi.getPage(page.getSkip(), page.getLimit())!!.products)
+                page.list.addAll(productApi.getPage(page.getSkip(), page.getLimit())!!.products)
                 withContext(Dispatchers.Main.immediate) {
-                    binding.reload.isVisible= false
-                    adapter.submitList(list)
+                    binding.reload.isVisible = false
+                    renderPage()
 
                 }
                 page = page.copy(index = page.index.inc(), isRequesting = false)
@@ -130,7 +152,7 @@ class ProductPage : Fragment(), OnItemListener {
                     Snackbar.make(binding.root, "Oops, something went wrong!", Snackbar.LENGTH_INDEFINITE)
                         .also { snackbar = it }
                         .show()
-                    if (adapter.currentList.isEmpty()) {
+                    if (page.list.isEmpty()) {
                         binding.reload.isVisible = true
                         binding.reload.isEnabled = true
                     }
@@ -140,10 +162,24 @@ class ProductPage : Fragment(), OnItemListener {
 
         }
     }
+    private fun renderPage(){
+        poop("${page.list.size} - ${page.filter}")
+        if (page.filter==null){
+            adapter.submitList(page.list)
+        }else{
+            adapter.submitList(page.list.filter { it.category == page.filter })
+        }
+    }
+
     private fun hideKeyboard() {
         val imm =
             binding.root.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(binding.root.windowToken, 0)
+    }
+
+    override fun onChipChecked(category: String?) {
+        page = page.copy(filter = category)
+        renderPage()
     }
 
 

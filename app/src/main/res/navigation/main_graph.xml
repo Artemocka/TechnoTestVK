@@ -9,24 +9,32 @@
 
     <fragment
         android:id="@+id/products"
-        android:name="com.example.technotestvk.ProductPage"
+        android:name="com.example.technotestvk.mainpage.ProductPage"
         android:label="fragment_products"
         tools:layout="@layout/fragment_products"
         >
+        <argument
+            android:name="id"
+            app:argType="integer"
+            />
         <action
-            android:id="@+id/action_products_to_productPageFragment2"
+            android:id="@+id/action_main_to_product"
             app:destination="@id/productPageFragment"
             />
     </fragment>
     <fragment
         android:id="@+id/productPageFragment"
-        android:name="com.example.technotestvk.ProductPageFragment"
+        android:name="com.example.technotestvk.productpage.ProductPageFragment"
         android:label="fragment_product_page"
         tools:layout="@layout/fragment_product_page"
         >
         <argument
             android:name="id"
             app:argType="integer"
+            />
+        <action
+            android:id="@+id/action_product_to_product"
+            app:destination="@id/productPageFragment"
             />
     </fragment>
 </navigation>
