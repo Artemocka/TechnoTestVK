@@ -2,8 +2,6 @@ package com.example.technotestvk.mainpage
 
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,10 +30,15 @@ import com.example.technotestvk.recycler.ProductRecyclerViewAdapter
 import com.example.technotestvk.viewmodel.ProductViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 
 class ProductPage : Fragment(), OnItemListener, OnChipListner {
@@ -47,7 +50,6 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
     private val productApi = getRetrofitClient().create(ProductApi::class.java)
     private val viewModel by viewModels<ProductViewModel>(::requireActivity)
     private var snackbar: Snackbar? = null
-    private var tempFilter:String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestNextPage()
@@ -84,9 +86,14 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             binding.searchBar.searchEditText.requestFocus()
             binding.searchBar.searchIcon.isVisible = false
             binding.chipRv.isVisible = false
-            tempFilter = page.filter
-            page = page.copy(filter = null)
 
+            chipsAdapter.currentList.map {
+                when {
+                    it.isChecked -> it.copy(isChecked = false)
+                    else -> it
+                }
+            }.let { chipsAdapter.submitList(it) }
+            page = page.copy(filter = null)
 
             val imm =
                 binding.root.context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -102,23 +109,34 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             binding.searchBar.root.isVisible = false
             binding.searchBar.searchIcon.isVisible = true
             binding.chipRv.isVisible = true
-            page = page.copy(filter = tempFilter)
-            tempFilter = null
             page = page.copy(search = null, searchList = mutableListOf())
             renderPage()
             hideKeyboard()
-
-
         }
-        binding.searchBar.searchEditText.addTextChangedListener(afterTextChanged = { text: Editable? ->
-            page = page.copy(search = text.toString())
-            requestSearch()
-            renderPage()
-        })
+        callbackFlow {
+            val listener =
+                binding.searchBar.searchEditText.addTextChangedListener { trySend(it.toString()) }
+            awaitClose { binding.searchBar.searchEditText.removeTextChangedListener(listener) }
+        }.debounce(0.5.toDuration(DurationUnit.SECONDS)).run {
+            lifecycleScope.launch {
+                collect {
+                    page = page.copy(search = it)
+                    requestSearch()
+                    renderPage()
+                }
+            }
+        }
+
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(Type.systemBars() or Type.displayCutout())
-            val rvPadding = binding.rvList.paddingTop
-            binding.rvList.setPadding(systemBars.left + rvPadding, rvPadding, systemBars.right + rvPadding, systemBars.bottom + rvPadding)
+            val rvPadding = resources.getDimensionPixelSize(R.dimen.margin_half)
+            binding.rvList.setPadding(
+                systemBars.left + rvPadding,
+                0,
+                systemBars.right + rvPadding,
+                systemBars.bottom
+            )
             binding.toolbar.updatePaddingRelative(top = systemBars.top)
 
             insets
@@ -153,7 +171,9 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
 
             } catch (_: Exception) {
                 withContext(Dispatchers.Main.immediate) {
-                    Snackbar.make(binding.root, "Oops, something went wrong!", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root,
+                        getString(R.string.oops_something_went_wrong), Snackbar.LENGTH_LONG)
+                        .show()
                 }
             }
         }
@@ -174,7 +194,8 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
                 }
             } catch (_: Exception) {
                 withContext(Dispatchers.Main.immediate) {
-                    Snackbar.make(binding.root, "Oops, something went wrong!", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, "Oops, something went wrong!", Snackbar.LENGTH_LONG)
+                        .show()
                 }
             }
         }
@@ -205,7 +226,11 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
             } catch (e: Exception) {
                 page = page.copy(isRequesting = false)
                 withContext(Dispatchers.Main) {
-                    Snackbar.make(binding.root, "Oops, something went wrong!", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(
+                        binding.root,
+                        "Oops, something went wrong!",
+                        Snackbar.LENGTH_INDEFINITE
+                    )
                         .also { snackbar = it }
                         .show()
                     if (page.list.isEmpty()) {
@@ -256,9 +281,8 @@ class ProductPage : Fragment(), OnItemListener, OnChipListner {
 }
 
 fun getRetrofitClient(): Retrofit {
-    val retrofit = Retrofit.Builder().baseUrl("https://dummyjson.com")
+    return Retrofit.Builder().baseUrl("https://dummyjson.com")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-    return retrofit
 }
 

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">TechnoTestVK</string>
-    <string name="from_the_same_category">From the same category</string>
+    <string name="from_the_same_category">From the same category:</string>
     <string name="reload">Reaload</string>
+    <string name="oops_something_went_wrong">Oops, something went wrong!</string>
 </resources>

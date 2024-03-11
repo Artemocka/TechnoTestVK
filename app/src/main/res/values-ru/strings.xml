@@ -2,4 +2,5 @@
     <string name="app_name">TechnoTestVK</string>
     <string name="from_the_same_category">Из той же категории:</string>
     <string name="reload">Перезагрузить</string>
+    <string name="oops_something_went_wrong">Упс, что то пошло не так!</string>
 </resources>

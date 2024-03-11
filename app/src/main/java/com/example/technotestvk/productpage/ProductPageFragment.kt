@@ -95,7 +95,7 @@ class ProductPageFragment : Fragment(), CategoryCardRecyclerViewAdapter.OnItemLi
                     ).top
                 )
                 categoryRv.updatePaddingRelative(
-                    bottom = binding.categoryRv.paddingTop + insets.getInsets(
+                    bottom = insets.getInsets(
                         WindowInsetsCompat.Type.navigationBars()
                     ).bottom
                 )
